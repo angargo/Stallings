@@ -1,0 +1,62 @@
+3
+3a
+b -a b
+-a b a
+5
+a
+b
+a b a
+a -b a
+2b a
+
+1
+a
+5
+a
+b
+a b a
+a -b a
+2b a
+
+2
+a
+c
+5
+a
+b
+a b a
+a -b a
+2b a
+
+2
+a b 2a
+a b a
+5
+a
+b
+a b a
+a -b a
+2b a
+
+2
+a b 2a
+a b a a b 2a a b 2a a b 2a
+5
+a
+b
+a b a
+a -b a
+2b a
+
+5
+a b -a -b
+2a b -2a -b
+2a 2b -a -b -a -b
+2a 2b a -2b -2a
+a 3b a -2b -2a
+5
+a
+b
+a b a
+a -b a
+2b a
