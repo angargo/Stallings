@@ -47,10 +47,12 @@ OBJECTS_DIR   = ./
 
 SOURCES       = ../stallings/main.cpp \
 		../stallings/graph.cpp \
-		../stallings/subgroup.cpp 
+		../stallings/subgroup.cpp \
+		../stallings/folding.cpp 
 OBJECTS       = main.o \
 		graph.o \
-		subgroup.o
+		subgroup.o \
+		folding.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/shell-unix.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
@@ -286,15 +288,20 @@ compiler_clean:
 ####### Compile
 
 main.o: ../stallings/main.cpp ../stallings/graph.hpp \
-		../stallings/subgroup.hpp
+		../stallings/subgroup.hpp \
+		../stallings/folding.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../stallings/main.cpp
 
 graph.o: ../stallings/graph.cpp ../stallings/graph.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o graph.o ../stallings/graph.cpp
 
 subgroup.o: ../stallings/subgroup.cpp ../stallings/subgroup.hpp \
-		../stallings/graph.hpp
+		../stallings/graph.hpp \
+		../stallings/folding.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o subgroup.o ../stallings/subgroup.cpp
+
+folding.o: ../stallings/folding.cpp ../stallings/folding.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o folding.o ../stallings/folding.cpp
 
 ####### Install
 

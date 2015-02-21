@@ -1,35 +1,26 @@
-#include "subgroup.hpp"
+#include <subgroup.hpp>
 
 #include <cassert>
 #include <cmath>
 #include <cassert>
 #include <sstream>
 
-using std::cout;
-using std::endl;
-using std::string;
+using namespace std;
 
 namespace stallings {
 
-/******************************   Folding   *******************************/
-
-void Folding::Show() const {
-	graph.Show();
-	cout << "Folding edges " << u << "-" << v << " and ";
-	cout << u << "-" << w << ", with label " << label << "." << endl;
+Subgroup::Subgroup() : has_base(false), is_folded(false) {
+	stallings_graph = Graph(1);  // Base vertex.
 }
 
-/******************************   Subgroup   ******************************/
-
-Subgroup::Subgroup(const std::vector<Element>& base_) : base(base_),
+Subgroup::Subgroup(const vector<Element>& base_) : base(base_),
 		has_base(true), is_folded(false){
 	// Create graph with a 'petal' for each element in the base.
 	stallings_graph = Graph(1);  // Base vertex.
 	for (const Element& element : base) {
 		AddElement(element, stallings_graph);
 	}
-	
-	has_base = true;
+
 	Fold();
 }
 
@@ -55,6 +46,16 @@ void Subgroup::ShowBase() const {
 	}
 }
 
+int Subgroup::GetBaseSize() const {
+	return base.size();
+}
+
+Element Subgroup::GetBaseElement(int idx) const {
+	assert((idx > 0 and idx <= int(base.size())) or (idx < 0 and idx >= -int(base.size())));
+	if (idx > 0) return base[idx - 1];
+	return Inverse(base[-idx - 1]);
+}
+
 void Subgroup::AddElement(const Element& element, Graph& graph) {
 	// Add a 'petal'.
 	int num_factors = element.size();
@@ -73,6 +74,14 @@ void Subgroup::AddElement(const Element& element, Graph& graph) {
 
 void Subgroup::Fold() {
 	if (is_folded) return;
+
+	// Get coordinates
+	coordinates.clear();
+	for (int i = 0; i < int(stallings_graph[0].size()); ++i) {
+		coordinates[stallings_graph[0][i]] = (i % 2 == 0 ? i / 2 + 1 : - i / 2 - 1);
+	}
+
+	// Do foldings
 	Folding fold;
 	while (stallings_graph.FindRepeatedEdge(fold.u, fold.v, fold.w, fold.label)) {
 		DoFolding(fold);
@@ -105,7 +114,7 @@ void Subgroup::DoFolding(Folding& fold) {
 	} else {
 		// Ensure fold.v < fold.w. As we'll merge them both into fold.v, if one of
 		// them is the 0, the result will still be 0.
-		if (fold.v > fold.w) std::swap(fold.v, fold.w);
+		if (fold.v > fold.w) swap(fold.v, fold.w);
 		bool skip = false, skiprev = false;
 		stallings_graph = Graph(oldgraph.Size() - 1);
 		for (int i = 0; i < oldgraph.Size(); ++i) {
@@ -129,7 +138,7 @@ void Subgroup::DoFolding(Folding& fold) {
 		}
 		assert(skip and skiprev);
 	}
-	foldings.push_back(std::move(fold));
+	foldings.push_back(move(fold));
 }
 
 bool Subgroup::Contains(const Element& element) const {
@@ -144,24 +153,78 @@ bool Subgroup::Contains(const Element& element) const {
 	return node == 0;
 }
 
+Path Subgroup::GetPath(const Element& element) const {
+	Path path;
+	int node = 0;
+	for (const short& factor : element) {
+		int v;
+		assert(stallings_graph.HasEdge(node, factor, v));
+		node = v;
+		path.push_back(Edge(v, factor));
+	}
+	return path;
+}
+
+vector<int> Subgroup::GetCoordinates(const Element& element) const {
+	Path path = GetPath(element);
+	for (int i = int(foldings.size()) - 1; i >= 0; --i) {
+		//cout << path << endl;
+		path = foldings[i].RaisePath(path);
+	}
+	//cout << "Final path: " << path << endl;
+
+	vector<int> res;
+	int pos = 0;
+	for (int i = 0; i < int(path.size()); ++i) {
+		if (pos == 0) {
+			auto it = coordinates.find(path[i]);
+			assert(it != coordinates.end());
+			res.push_back(it->second);
+		}
+		pos = path[i].v;
+	}
+	return res;
+}
+
+Element Subgroup::Inverse(const Element& element) {
+	Element ele;
+	for (int i = int(element.size()) - 1; i >= 0; --i) ele.push_back(-element[i]);
+	return ele;
+}
+
+Subgroup Subgroup::Intersection(const Subgroup& H, const Subgroup& K) {
+	// TODO ALL
+	assert(H.IsFolded());
+	assert(K.IsFolded());
+	Graph pull_back = Graph::PullBack(H.stallings_graph, K.stallings_graph);
+
+	// TODO Trimming
+	// TODO Connected components
+	// TODO Create a subgroup from the graph.
+
+	Subgroup HK;
+
+	return HK;
+}
+
 }  // namespace stallings
 
-std::ostream& operator<<(std::ostream& out, const stallings::Element& element) {
+ostream& operator<<(ostream& out, const stallings::Element& element) {
 	for (int i = 0; i < int(element.size()); ++i) {
 		if (i) out << " ";
 		if (element[i] < 0) out << '-';
-		out << char(std::abs(element[i]) + 'a' - 1);
+		out << char(abs(element[i]) + 'a' - 1);
 	}
 	return out;
 }
 
-std::istream& operator>>(std::istream& in, stallings::Element& element) {
+istream& operator>>(istream& in, stallings::Element& element) {
 	element.clear();
 	string line;
 	do {
 		getline(in, line);
 	} while (line.empty());
-	std::stringstream ss(line);
+	stringstream ss(line);
 	string factor;
 	while (ss >> factor) {
 		short f = 1;

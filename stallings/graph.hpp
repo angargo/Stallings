@@ -2,16 +2,26 @@
 #define GRAFO_HPP
 
 #include <vector>
+#include <iostream>
 
 namespace stallings {
 
 class Edge {
  public:
 	Edge() : v(0), label(0) {}
+
 	Edge(int v_, int label_) : v(v_), label(label_) {}
+
+	bool operator<(const Edge& b) const {
+		if (v == b.v) return label < b.label;
+		return v < b.v;
+	}
+
 	int v, label;
 	void Show() const;
 };
+
+typedef std::vector<Edge> Path;
 
 typedef std::vector<Edge> Adj;
 typedef std::vector<Adj> AdjList;
@@ -28,6 +38,7 @@ class Graph {
 	int Size() const {
 		return num_vertex;
 	}
+	void Resize(int size);
 	
 	// Add the specified edge to the graph.
 	void AddEdge(int u, int v, int label);
@@ -41,16 +52,22 @@ class Graph {
 	// Return true if there is an edge in u with specified label, and the
 	// neighbour through this edge.
 	bool HasEdge(int u, int label, int& v) const;
+	bool HasExactEdge(int u, int label, int v) const;
+
+	// For each label, a list of the edges with that label (label > 0).
+	std::vector<std::vector<std::pair<int, int>>> ListEdgesByLabel() const;
 	
 	// Prints the graph.
 	void Show() const;
-	
-	// Swap two graphs.
-	static void Swap(Graph& g1, Graph& g2);
-	
+
 	Adj& operator[](int idx) {
 		return list[idx];
 	}
+	
+	// Swap two graphs.
+	static void Swap(Graph& g1, Graph& g2);
+
+	static Graph PullBack(const Graph& gH, const Graph& gK);
 
  private:
 	int num_vertex;
@@ -58,5 +75,7 @@ class Graph {
 };
 
 }  // namespace stallings
+
+std::ostream& operator<<(std::ostream& out, const stallings::Path& path);
 
 #endif

@@ -5,11 +5,13 @@ CONFIG -= qt
 
 SOURCES += main.cpp \
     graph.cpp \
-    subgroup.cpp
+    subgroup.cpp \
+    folding.cpp
 
 HEADERS += \
     subgroup.hpp \
-    graph.hpp
+    graph.hpp \
+    folding.hpp
 
 OTHER_FILES += \
     ../assets/test.in

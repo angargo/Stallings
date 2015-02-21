@@ -1,28 +1,22 @@
 #ifndef SUBGROUP_HPP
 #define SUBGROUP_HPP
 
-#include "graph.hpp"
 #include <vector>
+#include <map>
 #include <iostream>
+
+#include <graph.hpp>
+#include <folding.hpp>
 
 namespace stallings {
 
 typedef std::vector<short> Element;
 
-class Folding {
- public:
-	Folding() : graph(), u(0), v(0), w(0), label(0) {}
-	void Show() const;
-	
-	Graph graph;
-	
-	// Edges u-v and u-w both have the same label.
-	int u, v, w, label;
-};
-
 class Subgroup {
  public:
+	Subgroup(); //Empty subgroup
 	explicit Subgroup(const std::vector<Element>& base_);
+
 	// Print the Stallings Graph.
 	void ShowGraph() const {
 		stallings_graph.Show();
@@ -35,6 +29,9 @@ class Subgroup {
 	// base are independent.
 	void ShowBase() const;
 	
+	int GetBaseSize() const;
+	Element GetBaseElement(int idx) const;
+
 	// Add element as a 'petal' to graph.
 	static void AddElement(const Element& element, Graph& graph);
 	
@@ -54,11 +51,18 @@ class Subgroup {
 	
 	// Return true if element is a member of the subgroup.
 	bool Contains(const Element& element) const;
+
+	Path GetPath(const Element& element) const;
+	std::vector<int> GetCoordinates(const Element& element) const;
+
+	static Element Inverse(const Element& element);
+	static Subgroup Intersection(const Subgroup& H, const Subgroup& K);
 	
  private:
 	std::vector<Element> base;
 	std::vector<Folding> foldings;
 	Graph stallings_graph;
+	std::map<Edge, int> coordinates;
 	
 	bool has_base;
 	bool is_folded;

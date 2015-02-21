@@ -1,14 +1,16 @@
-#include "graph.hpp"
+#include <graph.hpp>
 
 #include <iostream>
 #include <map>
 #include <cstdlib>
 #include <cassert>
 
+using namespace std;
+
 namespace stallings {
 
 void Edge::Show() const {
-	std::cout << "(" << v << "," << (label > 0 ? "" : "-") << char(abs(label) + 'a' - 1) << ")";
+	cout << "(" << v << "," << (label > 0 ? "" : "-") << char(abs(label) + 'a' - 1) << ")";
 }
 
 void Graph::AddEdge(int u, int v, int label) {
@@ -17,13 +19,18 @@ void Graph::AddEdge(int u, int v, int label) {
 }
 
 void Graph::AddVertex() {
-	++num_vertex;
+	Resize(num_vertex + 1);
+}
+
+void Graph::Resize(int size) {
+	assert(size >= num_vertex);
+	num_vertex = size;
 	list.resize(num_vertex);
 }
 
 bool Graph::FindRepeatedEdge(int& u, int& v, int& w, int& label) const {
 	for (u = 0; u < num_vertex; ++u) {
-		std::map<int, int> m;
+		map<int, int> m;
 		for (const Edge& edge : list[u]) {
 			if (m.count(edge.label)) {  // Repeated edge
 				v = edge.v;
@@ -46,22 +53,75 @@ bool Graph::HasEdge(int u, int label, int& v) const {
 	return false;
 }
 
+bool Graph::HasExactEdge(int u, int label, int v) const {
+	for (const Edge& edge : list[u]) {
+		if (edge.label == label and edge.v == v) return true;
+	}
+	return false;
+}
+
 void Graph::Show() const {
-	using std::cout;
 	assert(int(list.size()) == num_vertex);
-	cout << list.size() << std::endl;
+	cout << list.size() << endl;
 	for (int i = 0; i < num_vertex; ++i) {
 		for (const Edge& edge : list[i]) {
 			edge.Show();
 			cout << " ";
 		}
-		cout << std::endl;
+		cout << endl;
 	}
 }
 
 void Graph::Swap(Graph& g1, Graph& g2) {
-	std::swap(g1.list, g2.list);
-	std::swap(g1.num_vertex, g2.num_vertex);
+	swap(g1.list, g2.list);
+	swap(g1.num_vertex, g2.num_vertex);
+}
+
+vector<vector<pair<int, int>>> Graph::ListEdgesByLabel() const {
+	vector<vector<pair<int, int>>> res;
+	for (int i = 0; i < num_vertex; ++i) {
+	 for (const Edge& edge : list[i]) {
+		 if (edge.label > 0) {
+			 if (edge.label >= int(res.size())) res.resize(edge.label + 1);
+			 res[edge.label].push_back(make_pair(i, edge.v));
+		 }
+	 }
+	}
+	return res;
+}
+
+Graph Graph::PullBack(const Graph& gH, const Graph& gK) {
+	Graph pb;
+
+	vector<vector<pair<int, int>>> lH = gH.ListEdgesByLabel();
+	vector<vector<pair<int, int>>> lK = gK.ListEdgesByLabel();
+
+	map<pair<int, int>, int> index;
+	index[make_pair(0, 0)] = 0;
+	auto Index = [](map<pair<int, int>, int>& index, int u, int v) -> int {
+		if (index.count(make_pair(u, v))) return index[make_pair(u, v)];
+		return index[make_pair(u, v)] = index.size();
+	};
+
+	int nlabel = min(lH.size(), lK.size());
+	for (int l = 1; l < nlabel; ++l) {
+		for (const pair<int, int>& eH : lH[l]) {
+			for (const pair<int, int>& eK : lK[l]) {
+				int idu = Index(index, eH.first, eK.first), idv = Index(index, eH.second, eK.second);
+				if (max(idu, idv) >= pb.Size()) pb.Resize(max(idu, idv) + 1);
+				pb.AddEdge(idu, idv, l);
+			}
+		}
+	}
+
+	return pb;
 }
 
 } // namespace stallings
+
+ostream& operator<<(ostream& out, const stallings::Path& path) {
+	out << 0;
+	for (const stallings::Edge& edge : path)
+		out << " --(" << (edge.label > 0 ? "" : "-") << char(abs(edge.label) + 'a' - 1) << ")--> " << edge.v;
+	return out;
+}
