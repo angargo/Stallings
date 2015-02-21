@@ -16,6 +16,7 @@ class Subgroup {
  public:
 	Subgroup(); //Empty subgroup
 	explicit Subgroup(const std::vector<Element>& base_);
+	explicit Subgroup(const Graph& graph);
 
 	// Print the Stallings Graph.
 	void ShowGraph() const {

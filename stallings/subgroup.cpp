@@ -4,6 +4,7 @@
 #include <cmath>
 #include <cassert>
 #include <sstream>
+#include <stack>
 
 using namespace std;
 
@@ -22,6 +23,11 @@ Subgroup::Subgroup(const vector<Element>& base_) : base(base_),
 	}
 
 	Fold();
+}
+
+Subgroup::Subgroup(const Graph& graph) : has_base(false), is_folded(true) {
+	stallings_graph = graph;
+	// TODO get a base trololol
 }
 
 void Subgroup::ShowFoldings() const {
@@ -193,16 +199,62 @@ Element Subgroup::Inverse(const Element& element) {
 }
 
 Subgroup Subgroup::Intersection(const Subgroup& H, const Subgroup& K) {
-	// TODO ALL
 	assert(H.IsFolded());
 	assert(K.IsFolded());
-	Graph pull_back = Graph::PullBack(H.stallings_graph, K.stallings_graph);
+	Graph pb = Graph::PullBack(H.stallings_graph, K.stallings_graph);
 
-	// TODO Trimming
-	// TODO Connected components
-	// TODO Create a subgroup from the graph.
+	// Trimming
+	vector<int> deg(pb.Size());
+	for (int i = 0; i < pb.Size(); ++i) deg[i] = pb[i].size();
+	for (int i = 0; i < pb.Size(); ++i) {
+		int p = i;
+		while (p != 0 and deg[p] == 1) {
+			--deg[p];
+			for (int j = 0; j < int(pb[p].size()); ++j) if (deg[pb[p][j].v] != 0) {
+				p = pb[p][j].v; --deg[p];
+				break;
+			}
+		}
+	}
+	// We remove from the graphs the vertex with deg == 0 (except the root)
 
-	Subgroup HK;
+	// TODO Connected components.
+	stack<int> st;
+	st.push(0);
+	deg[0] = -1; // -1 means
+	while (not st.empty()) {
+		int u = st.top();
+		st.pop();
+		int e = pb[u].size();
+		for (int i = 0; i < e; ++i) {
+			if (deg[pb[u][i].v] > 0) { // Not removed and not seen
+				deg[pb[u][i].v] = -1;
+				st.push(pb[u][i].v);
+			}
+		}
+	}
+
+	int k = 0; // Nodes in the new graph.
+	for (int i = 0; i < pb.Size(); ++i) {
+		if (deg[i] == -1) deg[i] = k++;
+		else deg[i] = -1;
+	}
+
+	Graph gHK;
+	gHK.Resize(k);
+	for (int i = 0; i < pb.Size(); ++i) {
+		if (deg[i] != -1) {
+			int u = deg[i];
+			for (const Edge& edge : pb[i]) {
+				if (deg[edge.v] != -1) {
+					int v = deg[edge.v];
+					gHK[u].push_back(Edge(v, edge.label));
+				}
+			}
+		}
+	}
+
+	Subgroup HK(gHK);
 
 	return HK;
 }
