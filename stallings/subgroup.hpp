@@ -10,7 +10,7 @@
 
 namespace stallings {
 
-typedef std::vector<short> Element;
+typedef std::vector<int> Element;
 
 class Subgroup {
  public:
@@ -57,6 +57,7 @@ class Subgroup {
 	std::vector<int> GetCoordinates(const Element& element) const;
 
 	static Element Inverse(const Element& element);
+	static Element Product(const Element& a, const Element& b);
 	static Subgroup Intersection(const Subgroup& H, const Subgroup& K);
 	
  private:

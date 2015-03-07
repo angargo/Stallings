@@ -5,6 +5,8 @@
 #include <cassert>
 #include <sstream>
 #include <stack>
+#include <functional>
+#include <queue>
 
 using namespace std;
 
@@ -16,7 +18,6 @@ Subgroup::Subgroup() : has_base(false), is_folded(false) {
 
 Subgroup::Subgroup(const vector<Element>& base_) : base(base_),
 		has_base(true), is_folded(false){
-	// Create graph with a 'petal' for each element in the base.
 	stallings_graph = Graph(1);  // Base vertex.
 	for (const Element& element : base) {
 		AddElement(element, stallings_graph);
@@ -25,9 +26,65 @@ Subgroup::Subgroup(const vector<Element>& base_) : base(base_),
 	Fold();
 }
 
-Subgroup::Subgroup(const Graph& graph) : has_base(false), is_folded(true) {
-	stallings_graph = graph;
-	// TODO get a base trololol
+Subgroup::Subgroup(const Graph& graph) : has_base(true), is_folded(false) {
+	// Compute spanning tree
+	vector<int> root(graph.Size());
+	for (int i = 0; i < graph.Size(); ++i) root[i] = i;
+	function<int(int)> Root = [&root, &Root](int u) -> int {
+		if (root[u] == u) return u;
+		return root[u] = Root(root[u]);
+	};
+	Graph mst;
+	mst.Resize(graph.Size());
+	vector<tuple<int, int, int>> not_used;
+	for (int i = 0; i < graph.Size(); ++i) {
+		for (const Edge& edge : graph.const_list(i)) {
+			int ri = Root(i), rj = Root(edge.v);
+			if (ri != rj) {
+				root[ri] = rj;
+				mst.AddEdge(i, edge.v, edge.label);
+			} else if (i < edge.v) // We need the if to avoid repeating edges.
+				not_used.push_back(make_tuple(i, edge.v, edge.label));
+		}
+	}
+
+	// Shortest path from every node to the root
+	vector<Edge> prev(graph.Size());
+	vector<bool> dist(graph.Size(), -1);
+	queue<int> q;
+	q.push(0);
+	dist[0] = 0;
+	while (not q.empty()) {
+		int u = q.front();
+		for (const Edge& edge : mst[u]) {
+			if (dist[edge.v] == -1) { // Not seen
+				dist[edge.v] = dist[u] + 1;
+				prev[edge.v] = Edge(u, -edge.label);
+				q.push(edge.v);
+			}
+		}
+	}
+	vector<Element> path;
+	for (int i = 0; i < graph.Size(); ++i) {
+		// Path from i to the root
+		int u = i;
+		while (dist[u] > 0) {
+			path[i].push_back(prev[u].label);
+			u = prev[u].v;
+		}
+	}
+
+	// Build graph by closing the cycles.
+	stallings_graph = Graph(1);
+	for (auto& t : not_used) {
+		int u, v, label;
+		tie(u, v, label) = t;
+		Element b = Product(Product(Inverse(path[u]), Element(1, label)), path[v]);
+		AddElement(b, stallings_graph);
+		base.push_back(move(b));
+	}
+
+	Fold();
 }
 
 void Subgroup::ShowFoldings() const {
@@ -149,7 +206,7 @@ void Subgroup::DoFolding(Folding& fold) {
 
 bool Subgroup::Contains(const Element& element) const {
 	int node = 0;
-	for (const short& factor : element) {
+	for (const int& factor : element) {
 		int v;
 		if (stallings_graph.HasEdge(node, factor, v)) {
 			node = v;
@@ -162,7 +219,7 @@ bool Subgroup::Contains(const Element& element) const {
 Path Subgroup::GetPath(const Element& element) const {
 	Path path;
 	int node = 0;
-	for (const short& factor : element) {
+	for (const int& factor : element) {
 		int v;
 		assert(stallings_graph.HasEdge(node, factor, v));
 		node = v;
@@ -198,6 +255,21 @@ Element Subgroup::Inverse(const Element& element) {
 	return ele;
 }
 
+Element Subgroup::Product(const Element& a, const Element& b) {
+	Element p(a.size() + b.size());
+	int k = 0;
+	for (const int& f : a) {
+		if (k == 0 or p[k - 1] != -f) p[k++] = f;
+		else if (k > 0) --k;
+	}
+	for (const int& f : b) {
+		if (k == 0 or p[k - 1] != -f) p[k++] = f;
+		else if (k > 0) --k;
+	}
+	p.resize(k);
+	return p;
+}
+
 Subgroup Subgroup::Intersection(const Subgroup& H, const Subgroup& K) {
 	assert(H.IsFolded());
 	assert(K.IsFolded());
@@ -218,10 +290,11 @@ Subgroup Subgroup::Intersection(const Subgroup& H, const Subgroup& K) {
 	}
 	// We remove from the graphs the vertex with deg == 0 (except the root)
 
-	// TODO Connected components.
+	// TODO Connected components. Currently we only get the main cc.
+	// Trimming
 	stack<int> st;
 	st.push(0);
-	deg[0] = -1; // -1 means
+	deg[0] = -1; // -1 means it will be in the graph
 	while (not st.empty()) {
 		int u = st.top();
 		st.pop();
@@ -279,7 +352,7 @@ istream& operator>>(istream& in, stallings::Element& element) {
 	stringstream ss(line);
 	string factor;
 	while (ss >> factor) {
-		short f = 1;
+		int f = 1;
 		int p = 0;
 		if (factor[p] == '-') {
 			f = -1;

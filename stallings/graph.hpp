@@ -63,6 +63,10 @@ class Graph {
 	Adj& operator[](int idx) {
 		return list[idx];
 	}
+
+	const Adj& const_list(int idx) const {
+		return list[idx];
+	}
 	
 	// Swap two graphs.
 	static void Swap(Graph& g1, Graph& g2);

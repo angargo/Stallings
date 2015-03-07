@@ -9,17 +9,6 @@
 using namespace stallings;
 using namespace std;
 
-bool ReadElement(Element& element) {
-	string line;
-	if (getline(cin, line)) {
-		stringstream ss(line);
-		short factor;
-		while (ss >> factor) element.push_back(factor);
-		return true;
-	}
-	return false;
-}
-
 bool ReadBase(vector<Element>& base) {
 	int n;
 	if (cin >> n) {
