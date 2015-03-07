@@ -1,62 +1,45 @@
-3
+subgroup sgA 3
 3a
 b -a b
 -a b a
-5
-a
-b
-a b a
-a -b a
-2b a
 
-1
+subgroup sgB 1
 a
-5
-a
-b
-a b a
-a -b a
-2b a
 
-2
+subgroup sgC 2
 a
 c
-5
-a
-b
-a b a
-a -b a
-2b a
 
-2
+subgroup sgD 2
 a b 2a
 a b a
-5
-a
-b
-a b a
-a -b a
-2b a
 
-2
+subgroup sgE 2
 a b 2a
 a b a a b 2a a b 2a a b 2a
-5
-a
-b
-a b a
-a -b a
-2b a
 
-5
+subgroup sgF 5
 a b -a -b
 2a b -2a -b
 2a 2b -a -b -a -b
 2a 2b a -2b -2a
 a 3b a -2b -2a
-5
+
+
+member sgA sgB sgC sgD sgE
 a
+member sgA sgB sgC sgD sgE
 b
+member sgA sgB sgC sgD sgE
 a b a
+member sgA sgB sgC sgD sgE
 a -b a
+member sgA sgB sgC sgD sgE
 2b a
+
+intersection sgA sgB sgAB
+intersection sgA sgC sgAC
+intersection sgA sgD sgAD
+intersection sgA sgE sgAE
+intersection sgA sgF sgAF
+intersection sgD sgE sgDE

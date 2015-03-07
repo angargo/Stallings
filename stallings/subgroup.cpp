@@ -43,19 +43,19 @@ Subgroup::Subgroup(const Graph& graph) : has_base(true), is_folded(false) {
 			if (ri != rj) {
 				root[ri] = rj;
 				mst.AddEdge(i, edge.v, edge.label);
-			} else if (i < edge.v) // We need the if to avoid repeating edges.
+			} else if (i < edge.v or (i == edge.v and edge.label > 0)) // We need the if to avoid repeating edges.
 				not_used.push_back(make_tuple(i, edge.v, edge.label));
 		}
 	}
 
 	// Shortest path from every node to the root
 	vector<Edge> prev(graph.Size());
-	vector<bool> dist(graph.Size(), -1);
+	vector<int> dist(graph.Size(), -1);
 	queue<int> q;
 	q.push(0);
 	dist[0] = 0;
 	while (not q.empty()) {
-		int u = q.front();
+		int u = q.front(); q.pop();
 		for (const Edge& edge : mst[u]) {
 			if (dist[edge.v] == -1) { // Not seen
 				dist[edge.v] = dist[u] + 1;
@@ -64,7 +64,7 @@ Subgroup::Subgroup(const Graph& graph) : has_base(true), is_folded(false) {
 			}
 		}
 	}
-	vector<Element> path;
+	vector<Element> path(graph.Size());
 	for (int i = 0; i < graph.Size(); ++i) {
 		// Path from i to the root
 		int u = i;
@@ -291,7 +291,6 @@ Subgroup Subgroup::Intersection(const Subgroup& H, const Subgroup& K) {
 	// We remove from the graphs the vertex with deg == 0 (except the root)
 
 	// TODO Connected components. Currently we only get the main cc.
-	// Trimming
 	stack<int> st;
 	st.push(0);
 	deg[0] = -1; // -1 means it will be in the graph
@@ -333,6 +332,13 @@ Subgroup Subgroup::Intersection(const Subgroup& H, const Subgroup& K) {
 }
 
 }  // namespace stallings
+
+ostream& operator<<(ostream& out, const stallings::Subgroup& sg) {
+	out << "<" << endl;
+	for (const stallings::Element& element : sg.GetBase()) out << "(" << element << ")," << endl;
+	out << ">";
+	return out;
+}
 
 ostream& operator<<(ostream& out, const stallings::Element& element) {
 	for (int i = 0; i < int(element.size()); ++i) {

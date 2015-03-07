@@ -31,6 +31,7 @@ class Subgroup {
 	void ShowBase() const;
 	
 	int GetBaseSize() const;
+	const std::vector<Element>& GetBase() const { return base; }
 	Element GetBaseElement(int idx) const;
 
 	// Add element as a 'petal' to graph.
@@ -72,6 +73,7 @@ class Subgroup {
 
 }  // namespace stallings
 
+std::ostream& operator<<(std::ostream& out, const stallings::Subgroup& sg);
 std::ostream& operator<<(std::ostream& out, const stallings::Element& element);
 std::istream& operator>>(std::istream& in,  stallings::Element& element);
 
