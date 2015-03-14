@@ -25,16 +25,34 @@ a b -a -b
 2a 2b a -2b -2a
 a 3b a -2b -2a
 
-
-member sgA sgB sgC sgD sgE
-a
-member sgA sgB sgC sgD sgE
+subgroup sgG 3
 b
-member sgA sgB sgC sgD sgE
 a b a
-member sgA sgB sgC sgD sgE
+2a
+
+index sgA
+
+index sgB
+
+index sgC
+
+index sgD
+
+index sgE
+
+index sgF
+
+index sgG
+
+member sgA sgB sgC sgD sgE sgF sgG
+a
+member sgA sgB sgC sgD sgE sgF sgG
+b
+member sgA sgB sgC sgD sgE sgF sgG
+a b a
+member sgA sgB sgC sgD sgE sgF sgG
 a -b a
-member sgA sgB sgC sgD sgE
+member sgA sgB sgC sgD sgE sgF sgG
 2b a
 
 intersection sgA sgB sgAB
@@ -42,4 +60,5 @@ intersection sgA sgC sgAC
 intersection sgA sgD sgAD
 intersection sgA sgE sgAE
 intersection sgA sgF sgAF
+intersection sgA sgG sgAG
 intersection sgD sgE sgDE

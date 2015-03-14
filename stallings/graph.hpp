@@ -29,19 +29,24 @@ typedef std::vector<Adj> AdjList;
 class Graph {
  public:
 	// Create an empty graph.
-	Graph() : num_vertex(0), list(0) {}
+	Graph() : num_vertex(0), max_label(0), list(0) {}
 	
 	// Create an empty graph with 'n' nodes.
-	explicit Graph(int n) : num_vertex(n), list(n) {}
+	explicit Graph(int n) : num_vertex(n), max_label(0), list(n) {}
 	
 	// Return the number of nodes.
 	int Size() const {
 		return num_vertex;
 	}
 	void Resize(int size);
+
+	int MaxLabel() const {
+		return max_label;
+	}
 	
 	// Add the specified edge to the graph.
-	void AddEdge(int u, int v, int label);
+	void AddEdge(int u, int v, int label);        // Bidirectional
+	void AddSingleEdge(int u, int v, int label);  // Only in one direction
 	
 	// Add a new vertex to the graph.
 	void AddVertex();
@@ -80,6 +85,7 @@ class Graph {
 
  private:
 	int num_vertex;
+	int max_label;
 	AdjList list;
 };
 

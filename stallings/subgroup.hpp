@@ -54,12 +54,22 @@ class Subgroup {
 	// Return true if element is a member of the subgroup.
 	bool Contains(const Element& element) const;
 
+	// Return a path in the graph to obtain 'element'.
 	Path GetPath(const Element& element) const;
+
+	// Return 'element' as a product of elements in the base.
 	std::vector<int> GetCoordinates(const Element& element) const;
+
+	// Return the index of the subgroup in a free group of rank 'rank'
+	int Index(int rank) const;
+	int Index() const; // Deduces the rank from the max label in the graph.
+	std::vector<Element> GetCosets() const;
 
 	static Element Inverse(const Element& element);
 	static Element Product(const Element& a, const Element& b);
 	static Subgroup Intersection(const Subgroup& H, const Subgroup& K);
+
+	const static int INFINIT_INDEX = -1;
 	
  private:
 	std::vector<Element> base;

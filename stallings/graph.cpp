@@ -16,8 +16,14 @@ void Edge::Show() const {
 }
 
 void Graph::AddEdge(int u, int v, int label) {
+	max_label = max(abs(label), max_label);
 	list[u].push_back(Edge(v, label));
 	list[v].push_back(Edge(u, -label));
+}
+
+void Graph::AddSingleEdge(int u, int v, int label) {
+	max_label = max(abs(label), max_label);
+	list[u].push_back(Edge(v, label));
 }
 
 void Graph::AddVertex() {

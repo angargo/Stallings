@@ -137,7 +137,7 @@ void Subgroup::DoFolding(Folding& fold) {
 			for (const Edge& edge : oldgraph[i]) {
 				if (skip or i != fold.u or edge.v != fold.w or edge.label != fold.label) {
 					if (skiprev or i != fold.w or edge.v != fold.u or edge.label != -fold.label) {
-						stallings_graph[i].push_back(edge);
+						stallings_graph.AddSingleEdge(i, edge.v, edge.label);
 					} else {
 						skiprev = true;
 					}
@@ -163,7 +163,7 @@ void Subgroup::DoFolding(Folding& fold) {
 				else if (nv > fold.w) --nv;
 				if (skip or i != fold.u or edge.v != fold.w or edge.label != fold.label) {
 					if (skiprev or i != fold.w or edge.v != fold.u or edge.label != -fold.label) {
-						stallings_graph[ni].push_back(Edge(nv, edge.label));
+						stallings_graph.AddSingleEdge(ni, nv, edge.label);
 					} else {
 						skiprev = true;
 					}
@@ -220,6 +220,36 @@ vector<int> Subgroup::GetCoordinates(const Element& element) const {
 		pos = path[i].v;
 	}
 	return res;
+}
+
+int Subgroup::Index(int rank) const {
+	assert(is_folded);
+	for (int i = 0; i < stallings_graph.Size(); ++i) {
+		if (int(stallings_graph.const_list(i).size()) != 2 * rank) return INFINIT_INDEX;
+	}
+	return stallings_graph.Size();
+}
+
+int Subgroup::Index() const {
+	return Index(stallings_graph.MaxLabel());
+}
+
+vector<Element> Subgroup::GetCosets() const {
+	assert(Index() != INFINIT_INDEX);
+	assert(is_folded);
+	vector<Edge> prev;
+	vector<int> dist;
+	stallings_graph.AllShortestPaths(prev, dist);
+	vector<Element> cosets(stallings_graph.Size());
+	for (int i = 0; i < stallings_graph.Size(); ++i) {
+		cosets[i] = Element(dist[i]);
+		int u = i;
+		while (dist[u] > 0) {
+			cosets[i][dist[u] - 1] = -prev[u].label;
+			u = prev[u].v;
+		}
+	}
+	return cosets;
 }
 
 Element Subgroup::Inverse(const Element& element) {
@@ -314,6 +344,7 @@ ostream& operator<<(ostream& out, const stallings::Subgroup& sg) {
 }
 
 ostream& operator<<(ostream& out, const stallings::Element& element) {
+	if (element.empty()) out << 0;
 	for (int i = 0; i < int(element.size()); ++i) {
 		if (i) out << " ";
 		if (element[i] < 0) out << '-';
