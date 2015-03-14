@@ -372,6 +372,7 @@ istream& operator>>(istream& in, stallings::Element& element) {
 		while ('0' <= factor[p] and factor[p] <= '9') num = 10 * num + int(factor[p++] - '0');
 		if ((f == 1 and p == 0) or (f == -1 and p == 1)) num = 1;
 		assert(p + 1 == int(factor.size()));
+		assert('a' <= factor[p]);
 		while (num--) element.push_back(f * int(factor[p] - 'a' + 1));
 	}
 	return in;

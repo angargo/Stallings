@@ -98,6 +98,7 @@ int main() {
 		else if (s == "intersection") IntersectionCommand();
 		else if (s == "index") IndexCommand();
 		else if (s == "graph") GraphCommand();
+		else if (s == "exit") break;
 		else cout << s << ": unknown command" << endl;
 		cout << endl;
 	}
