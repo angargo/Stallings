@@ -1,9 +1,11 @@
 #include <graph.hpp>
 
 #include <iostream>
-#include <map>
 #include <cstdlib>
 #include <cassert>
+#include <functional>
+#include <map>
+#include <queue>
 
 using namespace std;
 
@@ -58,6 +60,45 @@ bool Graph::HasExactEdge(int u, int label, int v) const {
 		if (edge.label == label and edge.v == v) return true;
 	}
 	return false;
+}
+
+void Graph::AllShortestPaths(std::vector<Edge>& prev, std::vector<int>& dist) const {
+	prev = vector<Edge>(num_vertex);
+	dist = vector<int>(num_vertex, -1);
+	queue<int> q;
+	q.push(0);
+	dist[0] = 0;
+	while (not q.empty()) {
+		int u = q.front(); q.pop();
+		for (const Edge& edge : list[u]) {
+			if (dist[edge.v] == -1) { // Not seen
+				dist[edge.v] = dist[u] + 1;
+				prev[edge.v] = Edge(u, -edge.label);
+				q.push(edge.v);
+			}
+		}
+	}
+}
+
+void Graph::ComputeSpanningTree(Graph& st, vector<tuple<int, int, int>>& not_used) const {
+	st = Graph(num_vertex);
+	vector<int> root(num_vertex);
+	for (int i = 0; i < num_vertex; ++i) root[i] = i;
+	function<int(int)> Root = [&root, &Root](int u) -> int {
+		if (root[u] == u) return u;
+		return root[u] = Root(root[u]);
+	};
+	for (int i = 0; i < num_vertex; ++i) {
+		for (const Edge& edge : list[i]) {
+			int ri = Root(i), rj = Root(edge.v);
+			if (ri != rj) {
+				root[ri] = rj;
+				st.AddEdge(i, edge.v, edge.label);
+			} else if (i < edge.v or (i == edge.v and edge.label > 0))
+				// We need the if to avoid repeating edges.
+				not_used.push_back(make_tuple(i, edge.v, edge.label));
+		}
+	}
 }
 
 void Graph::Show() const {

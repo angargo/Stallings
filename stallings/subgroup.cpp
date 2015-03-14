@@ -28,42 +28,15 @@ Subgroup::Subgroup(const vector<Element>& base_) : base(base_),
 
 Subgroup::Subgroup(const Graph& graph) : has_base(true), is_folded(false) {
 	// Compute spanning tree
-	vector<int> root(graph.Size());
-	for (int i = 0; i < graph.Size(); ++i) root[i] = i;
-	function<int(int)> Root = [&root, &Root](int u) -> int {
-		if (root[u] == u) return u;
-		return root[u] = Root(root[u]);
-	};
-	Graph mst;
-	mst.Resize(graph.Size());
 	vector<tuple<int, int, int>> not_used;
-	for (int i = 0; i < graph.Size(); ++i) {
-		for (const Edge& edge : graph.const_list(i)) {
-			int ri = Root(i), rj = Root(edge.v);
-			if (ri != rj) {
-				root[ri] = rj;
-				mst.AddEdge(i, edge.v, edge.label);
-			} else if (i < edge.v or (i == edge.v and edge.label > 0)) // We need the if to avoid repeating edges.
-				not_used.push_back(make_tuple(i, edge.v, edge.label));
-		}
-	}
+	Graph st;
+	graph.ComputeSpanningTree(st, not_used);
 
 	// Shortest path from every node to the root
-	vector<Edge> prev(graph.Size());
-	vector<int> dist(graph.Size(), -1);
-	queue<int> q;
-	q.push(0);
-	dist[0] = 0;
-	while (not q.empty()) {
-		int u = q.front(); q.pop();
-		for (const Edge& edge : mst[u]) {
-			if (dist[edge.v] == -1) { // Not seen
-				dist[edge.v] = dist[u] + 1;
-				prev[edge.v] = Edge(u, -edge.label);
-				q.push(edge.v);
-			}
-		}
-	}
+	vector<Edge> prev;
+	vector<int> dist;
+	st.AllShortestPaths(prev, dist);
+
 	vector<Element> path(graph.Size());
 	for (int i = 0; i < graph.Size(); ++i) {
 		// Path from i to the root

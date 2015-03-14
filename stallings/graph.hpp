@@ -54,6 +54,11 @@ class Graph {
 	bool HasEdge(int u, int label, int& v) const;
 	bool HasExactEdge(int u, int label, int v) const;
 
+	// Shortest path from every node to the root
+	void AllShortestPaths(std::vector<Edge>& prev, std::vector<int>& dist) const;
+
+	void ComputeSpanningTree(Graph& st, std::vector<std::tuple<int, int, int>>& not_used) const;
+
 	// For each label, a list of the edges with that label (label > 0).
 	std::vector<std::vector<std::pair<int, int>>> ListEdgesByLabel() const;
 	
