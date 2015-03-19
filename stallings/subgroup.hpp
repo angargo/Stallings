@@ -65,11 +65,15 @@ class Subgroup {
 	int Index() const; // Deduces the rank from the max label in the graph.
 	std::vector<Element> GetCosets() const;
 
+	// Return the subgroups in the fringe of this subgroup.
+	std::vector<Subgroup> GetFringe() const;
+
 	static Element Inverse(const Element& element);
 	static Element Product(const Element& a, const Element& b);
 	static Subgroup Intersection(const Subgroup& H, const Subgroup& K);
 
 	const static int INFINIT_INDEX = -1;
+	const static int MAX_FRINGE_NODES = 12;
 	
  private:
 	std::vector<Element> base;

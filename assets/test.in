@@ -30,6 +30,36 @@ b
 a b a
 2a
 
+subgroup sgH 3
+a
+b a -b
+2b a -2b
+
+subgroup sgK 3
+a b
+3a
+2a b a
+
+subgroup sgL 3
+b
+3a
+2a b a -b a
+
+intersection sgK sgL sgKL
+
+member sgKL
+-a b a -b a b -a b -a -b a
+
+member sgKL
+-a b a -b -a -a b a a b -a -b a
+
+intersection sgA sgH sgAH
+intersection sgG sgH sgGH
+
+fringe sgG
+
+exit
+
 index sgA
 
 index sgB

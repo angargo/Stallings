@@ -90,6 +90,17 @@ void GraphCommand() {
 	} else NotDefined(name);
 }
 
+void FringeCommand() {
+	string name;
+	cin >> name;
+	if (sgs.count(name)) {
+		cout << "Fringe of subgroup " << name << endl;
+		Subgroup& sg = sgs[name];
+		vector<Subgroup> fringe = sg.GetFringe();
+		for (const Subgroup& fsg : fringe) cout << fsg << endl;
+	} else NotDefined(name);
+}
+
 int main() {
 	string s;
 	while (cin >> s) {
@@ -98,6 +109,7 @@ int main() {
 		else if (s == "intersection") IntersectionCommand();
 		else if (s == "index") IndexCommand();
 		else if (s == "graph") GraphCommand();
+		else if (s == "fringe") FringeCommand();
 		else if (s == "exit") break;
 		else cout << s << ": unknown command" << endl;
 		cout << endl;

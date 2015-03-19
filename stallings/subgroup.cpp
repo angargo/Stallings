@@ -252,6 +252,27 @@ vector<Element> Subgroup::GetCosets() const {
 	return cosets;
 }
 
+vector<Subgroup> Subgroup::GetFringe() const {
+	vector<Subgroup> result;
+	vector<int> ss(stallings_graph.Size());
+
+	function<void(int,int)> Backtracking = [this, &Backtracking, &ss, &result](int i, int subsets) -> void {
+		if (i == int(stallings_graph.Size())) {
+			for (const int& i : ss) cerr << " " << i;
+			cerr << endl;
+			return;
+		}
+		for (int j = 0; j < subsets; ++j) {
+			ss[i] = j;
+			Backtracking(i + 1, subsets);
+		}
+		ss[i] = subsets;
+		Backtracking(i + 1, subsets + 1);
+	};
+
+	return result;
+}
+
 Element Subgroup::Inverse(const Element& element) {
 	Element ele;
 	for (int i = int(element.size()) - 1; i >= 0; --i) ele.push_back(-element[i]);
