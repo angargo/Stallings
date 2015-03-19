@@ -6,6 +6,7 @@
 #include <functional>
 #include <map>
 #include <queue>
+#include <set>
 
 using namespace std;
 
@@ -107,6 +108,27 @@ void Graph::ComputeSpanningTree(Graph& st, vector<tuple<int, int, int>>& not_use
 	}
 }
 
+void Graph::ComputeQuotient(Graph& qt, const std::vector<int>& relation) const {
+	assert(num_vertex == int(relation.size()));
+
+	int nodes = 0;
+	for (const int& subset : relation) nodes = max(nodes, subset + 1);
+
+	qt.Resize(nodes);
+	vector<vector<set<int>>> q_edges(nodes, vector<set<int>>(nodes));
+	for (int i = 0; i < num_vertex; ++i) {
+		int ni = relation[i];
+		for (const Edge& edge : list[i]) {
+			int nv = relation[edge.v];
+			if (q_edges[ni][nv].count(edge.label) == 0) {
+				q_edges[ni][nv].insert(edge.label);
+				q_edges[nv][ni].insert(-edge.label);
+				qt.AddEdge(ni, nv, edge.label);
+			}
+		}
+	}
+}
+
 void Graph::Show() const {
 	assert(int(list.size()) == num_vertex);
 	cout << list.size() << endl;
@@ -143,18 +165,18 @@ Graph Graph::PullBack(const Graph& gH, const Graph& gK) {
 	vector<vector<pair<int, int>>> lH = gH.ListEdgesByLabel();
 	vector<vector<pair<int, int>>> lK = gK.ListEdgesByLabel();
 
-	map<pair<int, int>, int> index;
-	index[make_pair(0, 0)] = 0;
-	auto Index = [](map<pair<int, int>, int>& index, int u, int v) -> int {
-		if (index.count(make_pair(u, v))) return index[make_pair(u, v)];
-		return index[make_pair(u, v)] = index.size();
+	map<pair<int, int>, int> mindex;
+	mindex[make_pair(0, 0)] = 0;
+	auto Index = [&mindex](int u, int v) {
+		if (mindex.count(make_pair(u, v))) return mindex[make_pair(u, v)];
+		return mindex[make_pair(u, v)] = mindex.size();
 	};
 
 	int nlabel = min(lH.size(), lK.size());
 	for (int l = 1; l < nlabel; ++l) {
 		for (const pair<int, int>& eH : lH[l]) {
 			for (const pair<int, int>& eK : lK[l]) {
-				int idu = Index(index, eH.first, eK.first), idv = Index(index, eH.second, eK.second);
+				int idu = Index(eH.first, eK.first), idv = Index(eH.second, eK.second);
 				if (max(idu, idv) >= pb.Size()) pb.Resize(max(idu, idv) + 1);
 				pb.AddEdge(idu, idv, l);
 			}

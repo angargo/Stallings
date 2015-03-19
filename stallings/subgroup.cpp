@@ -260,6 +260,11 @@ vector<Subgroup> Subgroup::GetFringe() const {
 		if (i == int(stallings_graph.Size())) {
 			for (const int& i : ss) cerr << " " << i;
 			cerr << endl;
+			Graph qt;
+			stallings_graph.ComputeQuotient(qt, ss);
+			Subgroup nsg(qt);
+			// TODO: Check if this subgroup is different from the previous ones.
+			result.push_back(move(nsg));
 			return;
 		}
 		for (int j = 0; j < subsets; ++j) {
@@ -269,6 +274,8 @@ vector<Subgroup> Subgroup::GetFringe() const {
 		ss[i] = subsets;
 		Backtracking(i + 1, subsets + 1);
 	};
+
+	Backtracking(0, 0);
 
 	return result;
 }

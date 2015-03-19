@@ -64,6 +64,8 @@ class Graph {
 
 	void ComputeSpanningTree(Graph& st, std::vector<std::tuple<int, int, int>>& not_used) const;
 
+	void ComputeQuotient(Graph& qt, const std::vector<int>& relation) const;
+
 	// For each label, a list of the edges with that label (label > 0).
 	std::vector<std::vector<std::pair<int, int>>> ListEdgesByLabel() const;
 	
