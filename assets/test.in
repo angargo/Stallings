@@ -45,18 +45,11 @@ b
 3a
 2a b a -b a
 
-intersection sgK sgL sgKL
+subgroup sgM 2
+a b
+a c b a
 
-member sgKL
--a b a -b a b -a b -a -b a
-
-member sgKL
--a b a -b -a -a b a a b -a -b a
-
-intersection sgA sgH sgAH
-intersection sgG sgH sgGH
-
-fringe sgG
+fringe sgM
 
 exit
 

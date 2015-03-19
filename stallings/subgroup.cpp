@@ -258,12 +258,11 @@ vector<Subgroup> Subgroup::GetFringe() const {
 
 	function<void(int,int)> Backtracking = [this, &Backtracking, &ss, &result](int i, int subsets) -> void {
 		if (i == int(stallings_graph.Size())) {
-			for (const int& i : ss) cerr << " " << i;
-			cerr << endl;
 			Graph qt;
 			stallings_graph.ComputeQuotient(qt, ss);
 			Subgroup nsg(qt);
-			// TODO: Check if this subgroup is different from the previous ones.
+			// Check if this subgroup is different from the previous ones.
+			for (const Subgroup& sgr : result) if (sgr.Equals(nsg)) return;
 			result.push_back(move(nsg));
 			return;
 		}
@@ -278,6 +277,11 @@ vector<Subgroup> Subgroup::GetFringe() const {
 	Backtracking(0, 0);
 
 	return result;
+}
+
+bool Subgroup::Equals(const Subgroup& sg) const {
+	assert(is_folded and sg.IsFolded());
+	return stallings_graph.IsIsomorphic(sg.stallings_graph);
 }
 
 Element Subgroup::Inverse(const Element& element) {

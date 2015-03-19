@@ -68,6 +68,8 @@ class Subgroup {
 	// Return the subgroups in the fringe of this subgroup.
 	std::vector<Subgroup> GetFringe() const;
 
+	bool Equals(const Subgroup& sg) const;
+
 	static Element Inverse(const Element& element);
 	static Element Product(const Element& a, const Element& b);
 	static Subgroup Intersection(const Subgroup& H, const Subgroup& K);

@@ -7,6 +7,7 @@
 #include <map>
 #include <queue>
 #include <set>
+#include <stack>
 
 using namespace std;
 
@@ -127,6 +128,33 @@ void Graph::ComputeQuotient(Graph& qt, const std::vector<int>& relation) const {
 			}
 		}
 	}
+}
+
+bool Graph::IsIsomorphic(const Graph& g) const {
+	if (num_vertex != g.Size()) return false;
+	if (max_label != g.MaxLabel()) return false;
+	vector<int> v(num_vertex, -1);
+	v[0] = 0; // The root is the same
+	stack<int> st;
+	st.push(0);
+	while (not st.empty()) {
+		int u = st.top();
+		st.pop();
+		int u2 = v[u];
+		vector<int> next(2 * max_label + 1, -1);
+		if (g.const_list(u2).size() != list[u].size()) return false;
+		for (const Edge& edge : g.const_list(u2)) next[max_label + edge.label] = edge.v;
+		for (const Edge& edge : list[u]) {
+			int n2 = next[max_label + edge.label];
+			if (n2 == -1) return false;
+			if (v[edge.v] == -1) {
+				v[edge.v] = n2;
+				st.push(edge.v);
+			}
+			else if (v[edge.v] != n2) return false;
+		}
+	}
+	return true;
 }
 
 void Graph::Show() const {

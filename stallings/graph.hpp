@@ -66,6 +66,8 @@ class Graph {
 
 	void ComputeQuotient(Graph& qt, const std::vector<int>& relation) const;
 
+	bool IsIsomorphic(const Graph& g) const;
+
 	// For each label, a list of the edges with that label (label > 0).
 	std::vector<std::vector<std::pair<int, int>>> ListEdgesByLabel() const;
 	
