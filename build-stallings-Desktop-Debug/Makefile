@@ -300,7 +300,8 @@ subgroup.o: ../stallings/subgroup.cpp ../stallings/subgroup.hpp \
 		../stallings/folding.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o subgroup.o ../stallings/subgroup.cpp
 
-folding.o: ../stallings/folding.cpp ../stallings/folding.hpp
+folding.o: ../stallings/folding.cpp ../stallings/folding.hpp \
+		../stallings/graph.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o folding.o ../stallings/folding.cpp
 
 ####### Install

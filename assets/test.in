@@ -51,8 +51,6 @@ a c b a
 
 fringe sgM
 
-exit
-
 index sgA
 
 index sgB
@@ -67,15 +65,15 @@ index sgF
 
 index sgG
 
-member sgA sgB sgC sgD sgE sgF sgG
+member sgA sgB sgC sgD sgE sgF sgG sgL sgK
 a
-member sgA sgB sgC sgD sgE sgF sgG
+member sgA sgB sgC sgD sgE sgF sgG sgL sgK
 b
-member sgA sgB sgC sgD sgE sgF sgG
+member sgA sgB sgC sgD sgE sgF sgG sgL sgK
 a b a
-member sgA sgB sgC sgD sgE sgF sgG
+member sgA sgB sgC sgD sgE sgF sgG sgL sgK
 a -b a
-member sgA sgB sgC sgD sgE sgF sgG
+member sgA sgB sgC sgD sgE sgF sgG sgL sgK
 2b a
 
 intersection sgA sgB sgAB
