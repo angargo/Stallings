@@ -120,6 +120,17 @@ void FringeCommand(istream& in) {
 	} else NotDefined(name);
 }
 
+void AlgextCommand(istream& in) {
+	string name;
+	in >> name;
+	if (sgs.count(name)) {
+		cout << "Algebraic extensions of subgroup " << name << endl;
+		Subgroup& sg = sgs[name];
+		vector<Subgroup> ae = sg.GetAlgebraicExtensions();
+		for (const Subgroup& aesg : ae) cout << aesg << endl;
+	} else NotDefined(name);
+}
+
 void ImportCommand(istream& in) {
 	string file;
 	in >> file;
@@ -163,6 +174,7 @@ void input(istream& in) {
 		else if (s == "index") IndexCommand(in);
 		else if (s == "graph") GraphCommand(in);
 		else if (s == "fringe") FringeCommand(in);
+		else if (s == "algext") AlgextCommand(in);
 		else if (s == "import") ImportCommand(in);
 		else if (s == "list") ListCommand(in);
 		else if (s == "clear") ClearCommand(in);

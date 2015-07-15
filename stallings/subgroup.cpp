@@ -296,9 +296,43 @@ vector<Subgroup> Subgroup::GetFringe() const {
 	return result;
 }
 
+vector<Subgroup> Subgroup::GetAlgebraicExtensions() const {
+	vector<Subgroup> ae;
+	vector<Subgroup> fringe = GetFringe();
+	// The set of algebraic extensions is the set of subgroups that do not have any
+	// free factor in the fringe (a Takahasi family). This can be done more efficiently.
+	int n = fringe.size();
+	for (int i = 0; i < n; ++i) {
+		bool alg = true;
+		for (int j = 0; j < n; ++j) {
+			if (i == j) continue;
+			if (fringe[j].IsFreeFactorOf(fringe[i])) {
+				alg = false;
+				break;
+			}
+		}
+		if (alg) ae.push_back(fringe[i]);
+	}
+	return GetFringe();
+}
+
 bool Subgroup::Equals(const Subgroup& sg) const {
 	assert(is_folded and sg.IsFolded());
 	return stallings_graph.IsIsomorphic(sg.stallings_graph);
+}
+
+bool Subgroup::IsSubgroupOf(const Subgroup& sg) const {
+	assert(is_folded and sg.IsFolded());
+	for (const Element& element : base) {
+		if (not sg.Contains(element)) return false;
+	}
+	return true;
+}
+
+bool Subgroup::IsFreeFactorOf(const Subgroup& sg) const {
+	if (not IsSubgroupOf(sg)) return false;
+	// TODO
+	return true;
 }
 
 Element Subgroup::Inverse(const Element& element) {

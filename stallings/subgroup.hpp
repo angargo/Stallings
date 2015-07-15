@@ -85,7 +85,13 @@ class Subgroup {
 	// Return the subgroups in the fringe of this subgroup.
 	std::vector<Subgroup> GetFringe() const;
 
+	// Return the algebraic extensions of this subgroup.
+	std::vector<Subgroup> GetAlgebraicExtensions() const;
+
+	// Inclusions.
 	bool Equals(const Subgroup& sg) const;
+	bool IsSubgroupOf(const Subgroup& sg) const;
+	bool IsFreeFactorOf(const Subgroup& sg) const;
 
 	static Element Inverse(const Element& element);
 	static Element Product(const Element& a, const Element& b);
