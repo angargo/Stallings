@@ -27,6 +27,10 @@ namespace stallings {
 class Whitehead {
 	public:
 		static std::function<Element(const Element&)> GetWhitehead(int s, const std::set<int>& scut);
+
+		static bool Reduce(std::vector<Element>& base, int rank);
+
+		static bool WhiteheadMinimizationProblem(std::vector<Element> base, int rank);
 };
 
 }  // namespace stallings

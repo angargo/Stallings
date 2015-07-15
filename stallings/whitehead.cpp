@@ -16,6 +16,7 @@
 */
 
 #include <whitehead.hpp>
+#include <cassert>
 
 using namespace std;
 
@@ -34,6 +35,57 @@ function<Element(const Element&)> Whitehead::GetWhitehead(int s, const set<int>&
 		}
 		return Subgroup::Reduce(res);
 	};
+}
+
+bool Whitehead::Reduce(vector<Element>& base, int rank) {
+	int oldsize = 0, bs = base.size();
+	for (const Element& element : base) oldsize += element.size();
+	//cerr << "Current size: " << oldsize << endl;
+
+	int mxmask = 1 << (2 * rank);
+	for (int m = 0; m < mxmask; ++m) {
+		// [0, rank) = a, b, c, d, ...; [rank, 2 * rank) = -a, -b, -c, -d, ...
+		set<int> scut;
+		for (int i = 0; i < rank; ++i) if ((m & (1 << i))) scut.insert(i + 1);
+		for (int i = rank; i < rank + rank; ++i) if ((m & (1 << i))) scut.insert(-(i - rank + 1));
+		for (int s = -rank; s <= rank; ++s) {
+			if (s == 0) continue;
+			if (scut.count(s) and not scut.count(-s)) {
+				//cerr << s << " {";
+				//for (int k : scut) cerr << k << ",";
+				//cerr << "}" << endl;
+				auto phi = GetWhitehead(s, scut);
+				vector<Element> b2(bs);
+				int newsize = 0;
+				for (int i = 0; i < bs; ++i) {
+					b2[i] = phi(base[i]);
+					//cerr << b2[i] << endl;
+					newsize += b2[i].size();
+				}
+				//cerr << newsize << endl;
+				if (newsize < oldsize) {
+					swap(base, b2);
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
+bool Whitehead::WhiteheadMinimizationProblem(vector<Element> base, int rank) {
+	assert(rank < 13); // Just to put a limit.
+	//cerr << "Minimizing with rank " << rank << endl;
+	//for (const Element& element : base) cerr << element << endl;
+	//cerr << endl;
+	while (Reduce(base, rank)) {
+		//cerr << "Reduced:" << endl;
+		//for (const Element& element : base) cerr << element << endl;
+		//cerr << endl;
+	}
+	int size = 0;
+	for (const Element& element : base) size += element.size();
+	return size == int(base.size());
 }
 
 

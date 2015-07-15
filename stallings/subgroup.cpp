@@ -16,6 +16,7 @@
 */
 
 #include <subgroup.hpp>
+#include <whitehead.hpp>
 
 #include <cassert>
 #include <cmath>
@@ -307,6 +308,7 @@ vector<Subgroup> Subgroup::GetAlgebraicExtensions() const {
 		for (int j = 0; j < n; ++j) {
 			if (i == j) continue;
 			if (fringe[j].IsFreeFactorOf(fringe[i])) {
+				//cerr << j << " free factor of " << i << endl;
 				alg = false;
 				break;
 			}
@@ -342,9 +344,8 @@ bool Subgroup::IsFreeFactorOf(const Subgroup& sg) const {
 		//cerr << element << " = " << ng.back() << endl;
 	}
 
-
-	// TODO
-	return true;
+	if (Whitehead::WhiteheadMinimizationProblem(ng, rank)) return true;
+	return false;
 }
 
 Element Subgroup::Inverse(const Element& element) {
