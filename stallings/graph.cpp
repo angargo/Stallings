@@ -178,9 +178,10 @@ void Graph::Show() const {
 	assert(int(list.size()) == num_vertex);
 	cout << list.size() << endl;
 	for (int i = 0; i < num_vertex; ++i) {
+		cout << i << ":";
 		for (const Edge& edge : list[i]) {
-			edge.Show();
 			cout << " ";
+			edge.Show();
 		}
 		cout << endl;
 	}

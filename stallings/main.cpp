@@ -124,15 +124,20 @@ void ImportCommand(istream& in) {
 	string file;
 	in >> file;
 	ifstream fin(file);
+	if (not fin.good()) {
+		cout << "Cannot open file" << endl;
+		return;
+	}
 	cout.setstate(ios_base::failbit);
 	input(fin);
 	cout.clear();
 	fin.close();
+	cout << "Import succesful" << endl;
 }
 
 void ListCommand(istream& in) {
 	for (const pair<string, Subgroup>& p : sgs) {
-		cout << endl << p.first << " " << p.second << endl;
+		cout << endl << p.first << " = " << p.second << endl;
 	}
 }
 
@@ -140,9 +145,17 @@ void ClearCommand(istream& in) {
 	sgs.clear();
 }
 
+void ShowCommand(istream& in) {
+	string name;
+	in >> name;
+	if (sgs.count(name)) {
+		cout << name << " = " << sgs[name] << endl;
+	} else NotDefined(name);
+}
+
 void input(istream& in) {
 	string s;
-	cout << "> ";
+	cout << "#> ";
 	while (in >> s) {
 		if (s == "subgroup") SubgroupCommand(in);
 		else if (s == "member") MemberCommand(in);
@@ -153,9 +166,10 @@ void input(istream& in) {
 		else if (s == "import") ImportCommand(in);
 		else if (s == "list") ListCommand(in);
 		else if (s == "clear") ClearCommand(in);
+		else if (s == "show") ShowCommand(in);
 		else if (s == "exit") break;
 		else cout << s << ": unknown command" << endl;
-		cout << endl << "> ";
+		cout << endl << "#> ";
 	}
 }
 
