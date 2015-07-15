@@ -48,11 +48,13 @@ OBJECTS_DIR   = ./
 SOURCES       = ../stallings/main.cpp \
 		../stallings/graph.cpp \
 		../stallings/subgroup.cpp \
-		../stallings/folding.cpp 
+		../stallings/folding.cpp \
+		../stallings/whitehead.cpp 
 OBJECTS       = main.o \
 		graph.o \
 		subgroup.o \
-		folding.o
+		folding.o \
+		whitehead.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/shell-unix.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
@@ -303,6 +305,9 @@ subgroup.o: ../stallings/subgroup.cpp ../stallings/subgroup.hpp \
 folding.o: ../stallings/folding.cpp ../stallings/folding.hpp \
 		../stallings/graph.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o folding.o ../stallings/folding.cpp
+
+whitehead.o: ../stallings/whitehead.cpp ../stallings/whitehead.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o whitehead.o ../stallings/whitehead.cpp
 
 ####### Install
 

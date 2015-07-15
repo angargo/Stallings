@@ -313,7 +313,7 @@ vector<Subgroup> Subgroup::GetAlgebraicExtensions() const {
 		}
 		if (alg) ae.push_back(fringe[i]);
 	}
-	return GetFringe();
+	return ae;
 }
 
 bool Subgroup::Equals(const Subgroup& sg) const {
@@ -331,6 +331,18 @@ bool Subgroup::IsSubgroupOf(const Subgroup& sg) const {
 
 bool Subgroup::IsFreeFactorOf(const Subgroup& sg) const {
 	if (not IsSubgroupOf(sg)) return false;
+	int rank = sg.GetBaseSize();
+	vector<Element> ng;
+	// Change base
+	//cerr << "Change base: " << endl;
+	//for (const Element& element : sg.GetBase()) cerr << element << endl;
+	//cerr << endl;
+	for (const Element& element : base) {
+		ng.push_back(sg.GetCoordinates(element));
+		//cerr << element << " = " << ng.back() << endl;
+	}
+
+
 	// TODO
 	return true;
 }
@@ -354,6 +366,15 @@ Element Subgroup::Product(const Element& a, const Element& b) {
 	}
 	p.resize(k);
 	return p;
+}
+
+Element Subgroup::Reduce(const Element& element) {
+	Element res;
+	for (const int& factor : element) {
+		if (res.empty() or res.back() != -factor) res.push_back(factor);
+		else res.pop_back();
+	}
+	return res;
 }
 
 Subgroup Subgroup::Intersection(const Subgroup& H, const Subgroup& K) {

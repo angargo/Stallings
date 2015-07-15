@@ -18,9 +18,9 @@
 #include <folding.hpp>
 #include <cassert>
 
-namespace stallings {
-
 using namespace std;
+
+namespace stallings {
 
 void Folding::Show() const {
 	graph.Show();

@@ -95,6 +95,7 @@ class Subgroup {
 
 	static Element Inverse(const Element& element);
 	static Element Product(const Element& a, const Element& b);
+	static Element Reduce(const Element& element);
 	static Subgroup Intersection(const Subgroup& H, const Subgroup& K);
 
 	const static int INFINIT_INDEX = -1;
