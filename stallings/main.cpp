@@ -21,6 +21,7 @@
 #include <algorithm>
 #include <vector>
 #include <iostream>
+#include <fstream>
 #include <sstream>
 
 using namespace stallings;
@@ -28,25 +29,27 @@ using namespace std;
 
 map<string, Subgroup> sgs;
 
+void input(istream&);
+
 void NotDefined(const string& name) {
 	cout << "Subgroup " << name << " is not defined." << endl;
 }
 
-void SubgroupCommand() {
+void SubgroupCommand(istream& in) {
 	string name;
 	int n;
-	cin >> name >> n;
+	in >> name >> n;
 	vector<Element> base(n);
-	for (Element& ele : base) cin >> ele;
+	for (Element& ele : base) in >> ele;
 	sgs[name] = Subgroup(base);
 	cout << name << " = " << sgs[name] << endl;
 }
 
-void MemberCommand() {
+void MemberCommand(istream& in) {
 	string list;
-	getline(cin, list);
+	getline(in, list);
 	Element element;
-	cin >> element;
+	in >> element;
 	stringstream ss(list);
 	string name;
 	while (ss >> name) {
@@ -67,11 +70,10 @@ void MemberCommand() {
 	}
 }
 
-void IntersectionCommand() {
+void IntersectionCommand(istream& in) {
 	string name1, name2, name3;
-	cin >> name1 >> name2 >> name3;
+	in >> name1 >> name2 >> name3;
 	if (sgs.count(name1) and sgs.count(name2)) {
-		cerr << "Intersecting " << name1 << " " << name2 << endl;
 		Subgroup inter = Subgroup::Intersection(sgs[name1], sgs[name2]);
 		sgs[name3] = inter;
 		cout << name3 << " = " << sgs[name3] << endl;
@@ -81,9 +83,9 @@ void IntersectionCommand() {
 	}
 }
 
-void IndexCommand() {
+void IndexCommand(istream& in) {
 	string name;
-	cin >> name;
+	in >> name;
 	if (sgs.count(name)) {
 		Subgroup& sg = sgs[name];
 		int index = sg.Index();
@@ -97,9 +99,9 @@ void IndexCommand() {
 	} else NotDefined(name);
 }
 
-void GraphCommand() {
+void GraphCommand(istream& in) {
 	string name;
-	cin >> name;
+	in >> name;
 	if (sgs.count(name)) {
 		cout << "Graph of subgroup " << name << endl;
 		Subgroup& sg = sgs[name];
@@ -107,9 +109,9 @@ void GraphCommand() {
 	} else NotDefined(name);
 }
 
-void FringeCommand() {
+void FringeCommand(istream& in) {
 	string name;
-	cin >> name;
+	in >> name;
 	if (sgs.count(name)) {
 		cout << "Fringe of subgroup " << name << endl;
 		Subgroup& sg = sgs[name];
@@ -118,17 +120,45 @@ void FringeCommand() {
 	} else NotDefined(name);
 }
 
-int main() {
+void ImportCommand(istream& in) {
+	string file;
+	in >> file;
+	ifstream fin(file);
+	cout.setstate(ios_base::failbit);
+	input(fin);
+	cout.clear();
+	fin.close();
+}
+
+void ListCommand(istream& in) {
+	for (const pair<string, Subgroup>& p : sgs) {
+		cout << endl << p.first << " " << p.second << endl;
+	}
+}
+
+void ClearCommand(istream& in) {
+	sgs.clear();
+}
+
+void input(istream& in) {
 	string s;
-	while (cin >> s) {
-		if (s == "subgroup") SubgroupCommand();
-		else if (s == "member") MemberCommand();
-		else if (s == "intersection") IntersectionCommand();
-		else if (s == "index") IndexCommand();
-		else if (s == "graph") GraphCommand();
-		else if (s == "fringe") FringeCommand();
+	cout << "> ";
+	while (in >> s) {
+		if (s == "subgroup") SubgroupCommand(in);
+		else if (s == "member") MemberCommand(in);
+		else if (s == "intersection") IntersectionCommand(in);
+		else if (s == "index") IndexCommand(in);
+		else if (s == "graph") GraphCommand(in);
+		else if (s == "fringe") FringeCommand(in);
+		else if (s == "import") ImportCommand(in);
+		else if (s == "list") ListCommand(in);
+		else if (s == "clear") ClearCommand(in);
 		else if (s == "exit") break;
 		else cout << s << ": unknown command" << endl;
-		cout << endl;
+		cout << endl << "> ";
 	}
+}
+
+int main() {
+	input(cin);
 }
